@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dojo Widget Tutorial</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+        <!--<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dijit/themes/dijit.css" />-->
+        <!--<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dijit/themes/claro/claro.css" />-->
+
+        <script type="text/javascript">
+                    var dojoConfig = {
+                        async : true,
+                        debug : true,
+                        baseUrl : "./scripts/",
+                        packages : [
+                            {
+                                name : "tutorial",
+                                location : "tutorial"
+                            },
+                            {
+                                name : "formGenerator",
+                                location : "formGenerator"
+                            },
+                        ]
+                    };
+                </script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js"></script>
+        <script type="text/javascript" src="scripts/app.js"></script>
+
+    </head>
+    <body class="claro">
+        <div>Create an instance of BasicWidget, add it to a dijit/Dialog, and open the Dialog</div>
+        <button id="btn">Launch</button>
+
+        <div data-dojo-attach-point="newForm" id="newForm"></div>
+    </body>
+</html>

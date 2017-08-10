@@ -23,28 +23,26 @@ require([
         mappedSetterValue : "mapped setter value",
         buildTimeSetterValue : "build time setter value"
     });
-
-    var dijitType = {
-        dialog: 'dijit/Dialog',
-        text: 'dijit/form/TextBox',
-        radio: 'dijit/form/RadioButton',
-        date: 'dijit/form/DateTextBox',
-        button: 'dijit/form/Button',
-    };
-
+    
     var formFieldConfig = [
             {
                 type: 'text',
                 label: 'Solution',
                 dojoAttachPoint: 'folderSolution',
-                dojoProps: [
-                    'disabled:false', 'trim:true', 'maxLength:10',
-                ]
+                value: 'Google',
+                dojoProps: {
+                    disabled: true,
+                    trim: true,
+                    maxLength: 10
+                }
             },
             {
                 type: 'text',
                 label: 'Folder configuratie ID',
-                dojoAttachPoint: 'folderConfigID'
+                dojoAttachPoint: 'folderConfigID',
+                dojoProps: {
+                    disabled: true
+                }
             },
             {
                 type: 'radio',
@@ -54,11 +52,14 @@ require([
                 config: [
                     {
                         label: 'Ja',
-                        dojoAttachPoint: 'folderIsCreateParentJa'
+                        dojoAttachPoint: 'folderIsCreateParentJa',
+                        value: '1',
+                        checked: true
                     },
                     {
                         label: 'Nee',
-                        dojoAttachPoint: 'folderIsCreateParentNee'
+                        dojoAttachPoint: 'folderIsCreateParentNee',
+                        value: '0'
                     }
                 ]
             },
@@ -70,11 +71,14 @@ require([
                 config: [
                     {
                         label: 'Ja',
-                        dojoAttachPoint: 'folderIsNameFaseAliasJa'
+                        dojoAttachPoint: 'folderIsNameFaseAliasJa',
+                        value: '1',
+                        checked: true
                     },
                     {
                         label: 'Nee',
-                        dojoAttachPoint: 'folderIsNameFaseAliasNee'
+                        dojoAttachPoint: 'folderIsNameFaseAliasNee',
+                        value: '0'
                     }
                 ]
             },
@@ -86,6 +90,8 @@ require([
                 config: [
                     {
                         // label: 'Ja',
+                        value: '1',
+                        checked: true,
                         dojoAttachPoint: 'folderIsActiveCheckbox'
                     }
                 ]
@@ -98,16 +104,40 @@ require([
                 config: [
                     {
                         label: 'Optie 1',
-                        dojoAttachPoint: 'folderOption1'
+                        value: '1',
+                        checked: true,
                     },{
                         label: 'Optie 2',
-                        dojoAttachPoint: 'folderOption2'
+                        value: '2'
                     },{
                         label: 'Optie 3',
-                        dojoAttachPoint: 'folderOption3'
+                        value: '3',
+                        checked: true,
                     },{
                         label: 'Optie 4',
-                        dojoAttachPoint: 'folderOption4'
+                        value: '4'
+                    },
+                ]
+            },
+            {
+                type: 'select',
+                label: 'Selectbox',
+                name: 'folderSelection',
+                dojoAttachPoint: 'folderSelection',
+                config: [
+                    {
+                        label: 'Select 1',
+                        value: '1'
+                    },{
+                        label: 'Select 2',
+                        value: '2',
+                        selected: true
+                    },{
+                        label: 'Select 3',
+                        value: '3'
+                    },{
+                        label: 'Select 4',
+                        value: '4'
                     },
                 ]
             },
@@ -125,17 +155,18 @@ require([
                 type: 'text',
                 label: 'Aangepast op',
                 dojoAttachPoint: 'folderLastModifiedDate',
-                dojoProps: [
-                    'disabled:true'
-                ]
+                value: 'RayRay',
+                dojoProps: {
+                    disabled: true
+                }
             },
             {
                 type: 'date',
                 label: 'Aangepast door',
                 dojoAttachPoint: 'folderLastModifiedBy',
-                dojoProps: [
-                    'disabled:true'
-                ]
+                dojoProps: {
+                    disabled: true
+                }
             }
     ];
 

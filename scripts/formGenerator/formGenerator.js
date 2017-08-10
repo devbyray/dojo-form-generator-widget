@@ -16,6 +16,7 @@ define([
 	'dijit/form/DateTextBox',
 	'dijit/form/RadioButton',
 	'dijit/form/CheckBox',
+	'dijit/form/Select',
 	'dijit/layout/ContentPane',
 	'dojo/text!./templates/formGenerator.html'
 ], function (dom,
@@ -35,15 +36,13 @@ define([
 			 DateTextBox,
 			 RadioButton,
 			 CheckBox,
+			 Select,
 			 ContentPane,
 			 template) {
 	
 
 	return declare('CM5JavaScriptUtils.formGenerator', [_WidgetBase, _TemplatedMixin], {
 		constructor: function (arguments) {
-			console.log('FormGenerator!!');
-			console.log('arguments: ', arguments);
-
 			this.formGeneratorArguments = arguments;
 		},
 
@@ -71,10 +70,8 @@ define([
 
 
 			arrayUtil.forEach(this.formGeneratorArguments.formFields, function (formDataItem) {
-				console.log('formDataItem: ', formDataItem);
 
-				var FormItemType = formGenerator.checkFormFieldType(formDataItem.type);
-				// console.log('FormItemType: ', FormItemType);
+				var FormItemType = formGenerator.getFormFieldTypeInstance(formDataItem.type);
 
 				switch (formDataItem.type) {
 					case 'radio':
@@ -83,15 +80,18 @@ define([
 					case 'checkbox':
 						formGenerator.generateCheckboxes(FormItemType, formGeneratorTable, formDataItem);
 						break;
+					case 'select':
+						formGenerator.generateSelectBox(FormItemType, formGeneratorTable, formDataItem);
+						break;
 					default:
 						formGenerator.generateDefaultText(FormItemType, formGeneratorTable, formDataItem);
 				}
-				
+
 			});
 			formGeneratorTable.startup();
 		},
 
-		checkFormFieldType: function(formFieldType) {
+		getFormFieldTypeInstance: function(formFieldType) {
 			var fieldType = null;
 			switch (formFieldType) {
 				case 'date':
@@ -103,27 +103,44 @@ define([
 				case 'checkbox':
 					fieldType = CheckBox;
 					break;
+				case 'select':
+					fieldType = Select;
+					break;
 				default:
 					fieldType = TextBox;
 			}
 			return fieldType;
 		},
 
-		generateRadioButtons: function(RadioItemType, formGeneratorTable, formDataItem) {
-			var radioButtonWrapper = new ContentPane({
-				title: formDataItem.label,
+		setDojoProps: function (formFieldItem, dojoPropsObject) {
+			Object.keys(dojoPropsObject).forEach(function(dojoPropValue){
+				formFieldItem.set(dojoPropValue, dojoPropsObject[dojoPropValue]);
 			});
-			// console.log('radioButtonWrapper: ', radioButtonWrapper);
+		},
+
+		generateRadioButtons: function(RadioItemType, formGeneratorTable, formDataItem) {
+			var formGenerator = this;
+
+			var radioButtonWrapper = new ContentPane({
+				title: formDataItem.label
+			});
+
 			arrayUtil.forEach(formDataItem.config, function (radioButtonItem) {
 				var radioButtonLabelWrapper = new ContentPane();
 	
 				var radioButton = new RadioItemType({
 					title: radioButtonItem.label,
 					name: formDataItem.dojoAttachPoint,
+					value: radioButtonItem.value,
+					checked: radioButtonItem.checked || false
 				});
 	
 				if(radioButtonItem.dojoAttachPoint) {
 					domAttr.set(radioButton, 'data-dojo-attach-point', radioButtonItem.dojoAttachPoint);
+				}
+
+				if(radioButtonItem.dojoProps) {
+					formGenerator.setDojoProps(radioButton, radioButtonItem.dojoProps);
 				}
 	
 				var radioLabel = domConstruct.create('label', { for: radioButton.id, innerHTML: radioButtonItem.label}, radioButtonLabelWrapper.domNode);
@@ -131,6 +148,7 @@ define([
 				domStyle.set(radioButton.domNode, {
 					float: 'left'
 				});
+
 				domStyle.set(radioLabel, {
 					float: 'left',
 					marginRight: '.5em'
@@ -139,31 +157,40 @@ define([
 				radioButtonLabelWrapper.addChild(radioButton);
 				radioButtonWrapper.addChild(radioButtonLabelWrapper);
 			});
+
 			formGeneratorTable.addChild(radioButtonWrapper);
 		},
 		
 		generateCheckboxes: function(CheckboxItemType, formGeneratorTable, formDataItem) {
-			var radioButtonWrapper = new ContentPane({
+			var formGenerator = this;
+
+			var checkBoxWrapper = new ContentPane({
 				title: formDataItem.label,
 			});
+
+			arrayUtil.forEach(formDataItem.config, function (checkBoxItem) {
+				var checkBoxLabelWrapper = new ContentPane();
 	
-			arrayUtil.forEach(formDataItem.config, function (radioButtonItem) {
-				var radioButtonLabelWrapper = new ContentPane();
-	
-				var radioButton = new CheckboxItemType({
-					title: radioButtonItem.label,
+				var checkBox = new CheckboxItemType({
+					title: checkBoxItem.label,
 					name: formDataItem.dojoAttachPoint,
+					value: checkBoxItem.value,
+					checked: checkBoxItem.checked || false
 				});
 	
-				if(radioButtonItem.dojoAttachPoint) {
-					domAttr.set(radioButton, 'data-dojo-attach-point', radioButtonItem.dojoAttachPoint);
+				if(checkBoxItem.dojoAttachPoint) {
+					domAttr.set(checkBox, 'data-dojo-attach-point', checkBoxItem.dojoAttachPoint);
+				}
+
+				if(checkBoxItem.dojoProps) {
+					formGenerator.setDojoProps(checkBox, checkBoxItem.dojoProps);
 				}
 	
-				if(radioButtonItem.label !== undefined) {
+				if(checkBoxItem.label !== undefined) {
 					var radioLabel = domConstruct.create('label', {
-						for: radioButton.id,
-						innerHTML: radioButtonItem.label
-					}, radioButtonLabelWrapper.domNode);
+						for: checkBox.id,
+						innerHTML: checkBoxItem.label
+					}, checkBoxLabelWrapper.domNode);
 	
 					domStyle.set(radioLabel, {
 						float: 'left',
@@ -171,30 +198,56 @@ define([
 					});
 				}
 	
-				domStyle.set(radioButton.domNode, {
+				domStyle.set(checkBox.domNode, {
 					float: 'left'
 				});
-				domStyle.set(radioButtonLabelWrapper.domNode, {
+				domStyle.set(checkBoxLabelWrapper.domNode, {
 					display: 'block',
 					clear: 'both'
 				});
 	
-				radioButtonLabelWrapper.addChild(radioButton);
-				radioButtonWrapper.addChild(radioButtonLabelWrapper);
+				checkBoxLabelWrapper.addChild(checkBox);
+				checkBoxWrapper.addChild(checkBoxLabelWrapper);
 			});
-			formGeneratorTable.addChild(radioButtonWrapper);
+
+			formGeneratorTable.addChild(checkBoxWrapper);
 		},
 		
 		generateDefaultText: function(FormItemType, formGeneratorTable, formDataItem) {
 			var formItem = new FormItemType({
 				label: formDataItem.label,
 				type: formDataItem.type,
-				name: formDataItem.dojoAttachPoint
+				name: formDataItem.dojoAttachPoint,
+				value: formDataItem.value || null
 			});
-			// console.log('formItem: ', formItem);
+
 			if(formDataItem.dojoAttachPoint) {
 				domAttr.set(formItem, 'data-dojo-attach-point', formDataItem.dojoAttachPoint);
 			}
+
+			if(formDataItem.dojoProps) {
+				this.setDojoProps(formItem, formDataItem.dojoProps);
+			}
+
+			formGeneratorTable.addChild(formItem);
+		},
+		
+		generateSelectBox: function(SelectItemType, formGeneratorTable, formDataItem) {
+			var formItem = new SelectItemType({
+				label: formDataItem.label,
+				type: formDataItem.type,
+				name: formDataItem.dojoAttachPoint,
+				options: formDataItem.config,
+			});
+
+			if(formDataItem.dojoAttachPoint) {
+				domAttr.set(formItem, 'data-dojo-attach-point', formDataItem.dojoAttachPoint);
+			}
+
+			if(formDataItem.dojoProps) {
+				this.setDojoProps(formItem, formDataItem.dojoProps);
+			}
+
 			formGeneratorTable.addChild(formItem);
 		}
 		
